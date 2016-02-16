@@ -1,5 +1,7 @@
 # RAILS REFACTOR
 
+This repository is currently a work in progress, until the time that it's ready check out [https://github.com/jcrisp/rails_refactor](https://github.com/jcrisp/rails_refactor) for the original work.
+
 Basic renames and refactorings for rails projects.
 Although these are not perfect, they'll do a lot of the work for you 
 and save you time. 
@@ -12,32 +14,19 @@ To install:
 
 Before use, make sure you cd to the root of your rails project.
 
-To rename a controller:
-  $ rails_refactor rename OldController NewController 
+To rename a controller open up `rails console` and run:
+  \> RailsRefactor::Renamer.new("from_model", "to_model").rename
 
-* renames controller file & class name in file
-* renames controller spec file & class name in file
-* renames view directory
-* renames helper file & module name in file
+This will:
+
+* rename the controller file & class name in file
+* rename the controller spec file & class name in file
+* rename the view directory
+* rename the helper file & module name in file
 * updates routes
-
-To rename a controller action:
-  $ rails_refactor rename DummyController.old_action new_action
-
-* renames controller action in controller class file
-* renames view files for all formats
-
-To rename a model:
-  $ rails_refactor rename OldModel NewModel
-
-* renames model file & class name in file
-* renames spec file & class name in file
-* renames migration & class name & table names in file
-
-Please note that if you want to run the tests, clone the repo from github, rather than using the gem (tests rely on git). Next cd to the 'dummy' rails project directory.
-  $ ../lib/rails_refactor.rb test
-
-More refactorings coming soon... Please fork and contribute :-)
+* rename the model file & class name in file
+* rename the spec file & class name in file
+* rename the migration & class name & table names in file
 
 Started by James Crisp & Ryan Bigg pairing at RORO hack night 24 Nov 2010.
 Thanks to Andrew Snow for help with Gemification.
@@ -45,3 +34,4 @@ Thanks to Andrew Snow for help with Gemification.
 Thanks to Tricon for some improvements and start on TextMate Bundle:
 https://github.com/Tricon/rails-refactor.tmbundle
 
+Any questions open an issue or hit me up on Twitter: [@nmdowse](https://twitter.com/nmdowse).
