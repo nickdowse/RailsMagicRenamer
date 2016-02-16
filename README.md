@@ -1,5 +1,5 @@
 # RAILS REFACTOR
---------------
+
 Basic renames and refactorings for rails projects.
 Although these are not perfect, they'll do a lot of the work for you 
 and save you time. 
