@@ -1,2 +1,0 @@
-rvm --create --install 1.9.3@rails_refactor
-rvm use 1.9.3@rails_refactor

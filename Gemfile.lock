@@ -78,5 +78,4 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  echoe
-  rails (= 3.0.1)
+  rails (= 3.2.18)
