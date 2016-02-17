@@ -1,13 +1,38 @@
 require 'rails_refactor/version'
+require 'rails_refactor/exceptions'
 require 'active_support/inflector'
 require 'active_support/core_ext/string/inflections'
 
 module RailsRefactor
+
   # called from rails console: RailsRefactor::Renamer.new("model_one", "model_two").rename
   class Renamer
     def initialize(from, to)
-      # get current working directory and find the root path here
       @from, @to = from, to
+      begin
+        valid_renamer?
+      rescue RefactorError => e
+        raise RailsRefactor::InvalidObjectError.new(e.message)
+      end
+    end
+
+    def valid_renamer?
+      raise RailsRefactor::RenameFromObjectDoesNotExistError.new if !from_exists?
+      raise RailsRefactor::RenameToObjectExistsError.new if to_exists?
+      # raise RailsRefactor::RootDirectoryError.new if !in_root_directory?
+      return true
+    end
+
+    def from_exists?
+      return Object.const_get(@from) rescue false
+    end
+
+    def to_exists?
+      return Object.const_get(@to) rescue false
+    end
+
+    def in_root_directory?
+      File.exist?('./config/environment.rb')
     end
 
     # one entry point

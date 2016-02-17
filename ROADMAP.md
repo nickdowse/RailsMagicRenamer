@@ -4,11 +4,18 @@ Currently the gem is not a set and forget tool, you still need to do a lot of ma
 
 I would like this gem to rename much more comprehensively than it currently is, and as such will work towards completing these following steps, some of which have already been completed:
 
-* Check out new branch in git
+Could be issues with relations in non-model files.
+
+Eg company.campaigns in the orders controller
+
+Here --^ look for all associations and check the type of the caller. Not strictly a necessity as the type of the caller is what matters most not the name (eg company vs c)
+
 * Check if there's already a model with the same name as what you're going to (file exists?)
+* Check out new branch in git
 * Change model file name (campaign.rb -> distribution.rb)
 * Update class reference (class Campaign -> class Distribution)
 * Update has_one/has_many/belongs_to relationships (eg has_many :campaigns -> has_many :distributions)
+* Update :through relationships
 * Update all classes that inherit from Campaign (class EmailCampign < Campaign -> class EmailCampaign < Distribution)
 * Change all references to that file (Campaign.blah_blah_blah -> Distribution.blah_blah_blah)
 * Change all references from model -> model (@pressdoc.campaigns -> @pressdoc.distributions)
