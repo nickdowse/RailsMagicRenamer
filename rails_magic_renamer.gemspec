@@ -1,15 +1,15 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'rails_refactor/version'
+require 'rails_magic_renamer/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "rails_refactor"
-  spec.version       = RailsRefactor::VERSION
+  spec.name          = "rails_magic_renamer"
+  spec.version       = RailsMagicRenamer::VERSION
   spec.authors       = ["Nick Dowse"]
   spec.email         = ["nm.dowse@gmail.com"]
-  spec.description   = %q{Rename rails models}
-  spec.summary       = %q{Rename rails models}
+  spec.description   = %q{Rename rails models, magically}
+  spec.summary       = %q{Rename rails models, magically}
   spec.homepage      = ""
   spec.license       = "MIT"
 

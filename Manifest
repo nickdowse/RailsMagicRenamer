@@ -4,5 +4,5 @@ Gemfile.lock
 Manifest
 README
 Rakefile
-lib/rails_refactor.rb
-lib/rails_refactor/version.rb
+lib/rails_magic_renamer.rb
+lib/rails_magic_renamer/version.rb

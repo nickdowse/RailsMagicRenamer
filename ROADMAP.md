@@ -1,4 +1,4 @@
-# RAILS REFACTOR Roadmap
+# RAILS MAGIC RENAMER Roadmap
 
 Currently the gem is not a set and forget tool, you still need to do a lot of manual renaming afterward the gem has done its work. 
 

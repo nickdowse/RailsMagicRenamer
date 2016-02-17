@@ -1,4 +1,4 @@
-require 'rails_refactor'
+require 'rails_magic_renamer'
 require 'rubygems'
 require 'spork'
 require 'active_support/all'

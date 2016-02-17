@@ -1,25 +1,25 @@
-require 'rails_refactor/version'
-require 'rails_refactor/exceptions'
+require 'rails_magic_renamer/version'
+require 'rails_magic_renamer/exceptions'
 require 'active_support/inflector'
 require 'active_support/core_ext/string/inflections'
 
-module RailsRefactor
+module RailsMagicRenamer
 
-  # called from rails console: RailsRefactor::Renamer.new("model_one", "model_two").rename
+  # called from rails console: RailsMagicRenamer::Renamer.new("model_one", "model_two").rename
   class Renamer
     def initialize(from, to)
       @from, @to = from, to
       begin
         valid_renamer?
-      rescue RefactorError => e
-        raise RailsRefactor::InvalidObjectError.new(e.message)
+      rescue RenamerError => e
+        raise RailsMagicRenamer::InvalidObjectError.new(e.message)
       end
     end
 
     def valid_renamer?
-      raise RailsRefactor::RenameFromObjectDoesNotExistError.new if !from_exists?
-      raise RailsRefactor::RenameToObjectExistsError.new if to_exists?
-      # raise RailsRefactor::RootDirectoryError.new if !in_root_directory?
+      raise RailsMagicRenamer::RenameFromObjectDoesNotExistError.new if !from_exists?
+      raise RailsMagicRenamer::RenameToObjectExistsError.new if to_exists?
+      # raise RailsMagicRenamer::RootDirectoryError.new if !in_root_directory?
       return true
     end
 

@@ -1,4 +1,4 @@
-# RAILS REFACTOR
+# RAILS MAGIC RENAMER
 
 This repository is currently a work in progress, until the time that it's ready check out [https://github.com/jcrisp/rails_refactor](https://github.com/jcrisp/rails_refactor) for the original work.
 
@@ -10,12 +10,12 @@ Before using, recommend that you start from a clean repository state so
 you can easily review changes.
 
 To install:
-  gem install rails_refactor
+  gem install rails_magic_renamer
 
 Before use, make sure you cd to the root of your rails project.
 
 To rename a controller open up `rails console` and run:
-  \> RailsRefactor::Renamer.new("from_model", "to_model").rename
+  \> RailsMagicRenamer::Renamer.new("from_model", "to_model").rename
 
 This will:
 
