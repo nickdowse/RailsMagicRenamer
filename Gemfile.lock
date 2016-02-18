@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_refactor (2.0)
+    rails_magic_renamer (2.0)
 
 GEM
   remote: http://rubygems.org/
@@ -104,7 +104,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.3)
   rails (~> 3.2.18)
-  rails_refactor!
+  rails_magic_renamer!
   rake
   rspec
   spork
