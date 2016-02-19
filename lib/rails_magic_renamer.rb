@@ -5,9 +5,11 @@ require 'active_support/core_ext/string/inflections'
 
 module RailsMagicRenamer
 
-  # called from rails console: RailsMagicRenamer::Renamer.new("model_one", "model_two").rename
+  # called from rails console: RailsMagicRenamer::Renamer.new("ModelOne", "ModelTwo").rename
   class Renamer
     def initialize(from, to)
+      from = from.to_s if !from.class != String
+      to = to.to_s if !to.class != String
       @from, @to = from, to
       begin
         valid_renamer?
@@ -16,11 +18,18 @@ module RailsMagicRenamer
       end
     end
 
+
+    # check that models can be renamed
     def valid_renamer?
+      raise RailsMagicRenamer::RenameObjectUnderscoredError.new if renamer_contains_underscores?
       raise RailsMagicRenamer::RenameFromObjectDoesNotExistError.new if !from_exists?
       raise RailsMagicRenamer::RenameToObjectExistsError.new if to_exists?
       # raise RailsMagicRenamer::RootDirectoryError.new if !in_root_directory?
       return true
+    end
+
+    def renamer_contains_underscores?
+      @from.match("_") || @to.match("_")
     end
 
     def from_exists?

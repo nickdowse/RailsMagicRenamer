@@ -9,6 +9,12 @@ module RailsMagicRenamer
     end
   end
 
+  class RenameObjectUnderscoredError < RenamerError
+    def initialize(message = "The object you are trying to rename to or from contains underscores. Your models must be formatted in CamelCase (eg MyModel).")
+      super(message)
+    end
+  end
+
   class RenameToObjectExistsError < RenamerError
     def initialize(message = "The object you are trying to rename to already exists.")
       super(message)
