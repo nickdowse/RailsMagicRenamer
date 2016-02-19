@@ -51,21 +51,27 @@ module RailsMagicRenamer
     end
 
     def model_rename
+      # commit any changes to git if is uncommitted and git is installed
+      `git add -A && git commit -m "Code before RailsMagicRenamer renaming"` if !`git status | grep "On branch"`.empty?
       to_model_file = @to.underscore + ".rb"
-      `mv app/models/#{@from.underscore}.rb app/models/#{to_model_file}`
+      # move model file
+      `mv app/models/#{@from.underscore}.rb app/models/#{to_model_file}` # here test for success?
+      # move model container file (eg app/models/companies/*.rb)
+      `mv app/models/#{@from.underscore} app/models/#{@to.underscore}`
+
       replace_in_file("app/models/#{to_model_file}", @from, @to)
 
-      to_spec_file = @to.underscore + "_spec.rb"
-      `mv spec/models/#{@from.underscore}_spec.rb spec/models/#{to_spec_file}`
-      replace_in_file("spec/models/#{to_spec_file}", @from, @to)
+      # to_spec_file = @to.underscore + "_spec.rb"
+      # `mv spec/models/#{@from.underscore}_spec.rb spec/models/#{to_spec_file}`
+      # replace_in_file("spec/models/#{to_spec_file}", @from, @to)
 
-      Dir["db/migrate/*_create_#{@from.underscore.pluralize}.rb"].each do |file|
-        timestamp_and_path = file.split('_')[0]
-        to_migration_path = "#{timestamp_and_path}_create_#{@to.underscore.pluralize}.rb"
-        `mv #{file} #{to_migration_path}`
-        replace_in_file(to_migration_path, "Create#{@from.pluralize}", "Create#{@to.pluralize}")
-        replace_in_file(to_migration_path, @from.underscore.pluralize, @to.underscore.pluralize)
-      end
+      # Dir["db/migrate/*_create_#{@from.underscore.pluralize}.rb"].each do |file|
+      #   timestamp_and_path = file.split('_')[0]
+      #   to_migration_path = "#{timestamp_and_path}_create_#{@to.underscore.pluralize}.rb"
+      #   `mv #{file} #{to_migration_path}`
+      #   replace_in_file(to_migration_path, "Create#{@from.pluralize}", "Create#{@to.pluralize}")
+      #   replace_in_file(to_migration_path, @from.underscore.pluralize, @to.underscore.pluralize)
+      # end
     end
 
     def controller_rename
