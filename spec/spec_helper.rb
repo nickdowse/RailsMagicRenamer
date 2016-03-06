@@ -3,6 +3,7 @@ require 'rubygems'
 require 'spork'
 require 'active_support/all'
 
+
 Spork.prefork do
 
   # From rspec generator
