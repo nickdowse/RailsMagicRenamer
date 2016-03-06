@@ -22,6 +22,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "spork"
-  spec.add_development_dependency 'rails', '~> 3.2.18'
+  spec.add_development_dependency 'rails', '~> 4.0.0'
 
 end
