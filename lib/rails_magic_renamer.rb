@@ -47,13 +47,19 @@ module RailsMagicRenamer
     # one entry point
     def rename
       model_rename
-      controller_rename
+      # controller_rename
     end
 
     def model_rename
       # commit any changes to git if is uncommitted and git is installed
       `git add -A && git commit -m "Code before RailsMagicRenamer renaming"` if !`git status | grep "On branch"`.empty?
       to_model_file = @to.underscore + ".rb"
+
+      Rails.application.eager_load!
+      rename_relations
+      rename_descendants
+      
+
       # move model file
       `mv app/models/#{@from.underscore}.rb app/models/#{to_model_file}` # here test for success?
       # move model container file (eg app/models/companies/*.rb)
@@ -61,54 +67,68 @@ module RailsMagicRenamer
 
       replace_in_file("app/models/#{to_model_file}", @from, @to)
 
-      # to_spec_file = @to.underscore + "_spec.rb"
-      # `mv spec/models/#{@from.underscore}_spec.rb spec/models/#{to_spec_file}`
-      # replace_in_file("spec/models/#{to_spec_file}", @from, @to)
-
-      # Dir["db/migrate/*_create_#{@from.underscore.pluralize}.rb"].each do |file|
-      #   timestamp_and_path = file.split('_')[0]
-      #   to_migration_path = "#{timestamp_and_path}_create_#{@to.underscore.pluralize}.rb"
-      #   `mv #{file} #{to_migration_path}`
-      #   replace_in_file(to_migration_path, "Create#{@from.pluralize}", "Create#{@to.pluralize}")
-      #   replace_in_file(to_migration_path, @from.underscore.pluralize, @to.underscore.pluralize)
-      # end
     end
 
-    def controller_rename
-      setup_for_controller_rename
+    def rename_relations
+      relations = @from.reflect_on_all_associations
+      # each relation...
+      # check whether there is a file where we expect it to be (eg app/models/#{relation.name.to_s.singularize}.rb)
+      # if so, find and replace the @from in that file
+      # if not, check if the class name specified is different.
+      # if the class name is different, then get that, underscore it, and try that file.
+      # if it exists, replace replace replace!
+      relations.each do |relation|
 
-      to_controller_path = "app/controllers/#{@to.underscore}.rb"
-      to_resource_name   = @to.gsub(/Controller$/, "")
-      to_resource_path   = to_resource_name.underscore
-
-      `mv app/controllers/#{@from.underscore}.rb #{to_controller_path}`
-      replace_in_file(to_controller_path, @from, @to)
-
-      # TODO: Use cross-platform move commands.
-      if File.exist?("spec/controllers/#{@from.underscore}_spec.rb")
-        to_spec = "spec/controllers/#{to_resource_path}_controller_spec.rb"
-        `mv spec/controllers/#{@from.underscore}_spec.rb #{to_spec}`
-        replace_in_file(to_spec, @from, @to)
       end
-
-      if Dir.exist?("app/views/#{@from_resource_path}")
-        `mv app/views/#{@from_resource_path} app/views/#{to_resource_path}`
-      end
-
-      to_helper_path = "app/helpers/#{to_resource_path}_helper.rb"
-      if File.exist?("app/helpers/#{@from_resource_path}_helper.rb")
-        `mv app/helpers/#{@from_resource_path}_helper.rb #{to_helper_path}`
-        replace_in_file(to_helper_path, @from_resource_name, to_resource_name)
-      end
-
-      replace_in_file('config/routes.rb', @from_resource_path, to_resource_path)
     end
 
-    def setup_for_controller_rename
-      @from_controller, @from_action = @from.split(".")
-      @from_resource_name = @from_controller.gsub(/Controller$/, "")
-      @from_resource_path = @from_resource_name.underscore
+    def rename_descendants
+      descendants = @from.descendants.map{|d| d.to_s}.sort
+      # for each descendant loop through
+      # check whether there is a file where we expect it to be (eg app/models/#{relation.name.to_s.singularize}.rb)
+      # if so replace in file
+      # rename file if it matches the rename criteria
+      descendants.each do |descendant|
+
+      end
     end
+
+
+    # def controller_rename
+    #   setup_for_controller_rename
+
+    #   to_controller_path = "app/controllers/#{@to.underscore}.rb"
+    #   to_resource_name   = @to.gsub(/Controller$/, "")
+    #   to_resource_path   = to_resource_name.underscore
+
+    #   `mv app/controllers/#{@from.underscore}.rb #{to_controller_path}`
+    #   replace_in_file(to_controller_path, @from, @to)
+
+    #   # TODO: Use cross-platform move commands.
+    #   if File.exist?("spec/controllers/#{@from.underscore}_spec.rb")
+    #     to_spec = "spec/controllers/#{to_resource_path}_controller_spec.rb"
+    #     `mv spec/controllers/#{@from.underscore}_spec.rb #{to_spec}`
+    #     replace_in_file(to_spec, @from, @to)
+    #   end
+
+    #   if Dir.exist?("app/views/#{@from_resource_path}")
+    #     `mv app/views/#{@from_resource_path} app/views/#{to_resource_path}`
+    #   end
+
+    #   to_helper_path = "app/helpers/#{to_resource_path}_helper.rb"
+    #   if File.exist?("app/helpers/#{@from_resource_path}_helper.rb")
+    #     `mv app/helpers/#{@from_resource_path}_helper.rb #{to_helper_path}`
+    #     replace_in_file(to_helper_path, @from_resource_name, to_resource_name)
+    #   end
+
+    #   replace_in_file('config/routes.rb', @from_resource_path, to_resource_path)
+    # end
+
+    # def setup_for_controller_rename
+    #   @from_controller, @from_action = @from.split(".")
+    #   @from_resource_name = @from_controller.gsub(/Controller$/, "")
+    #   @from_resource_path = @from_resource_name.underscore
+    # end
 
     def replace_in_file(path, find, replace)
       contents = File.read(path)

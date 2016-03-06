@@ -21,5 +21,12 @@ describe RailsMagicRenamer::Renamer do
     expect { RailsMagicRenamer::Renamer.new("DummyFromDoesExist", "DummyToDoesExist") }.to raise_error("The object you are trying to rename to already exists.")
   end
 
+  it "gets the relations of an object" do
+    relations = DummyFromDoesExist.reflect_on_all_associations
+  end
+
+  it "runs the specs properly" do
+     expect(`cd spec/sample_app_rails_4 && rspec | grep "0 failures"`.present?).to be(true)
+  end
   # add in check for not in root directory error
 end
