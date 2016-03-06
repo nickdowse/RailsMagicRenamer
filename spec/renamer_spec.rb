@@ -21,4 +21,8 @@ describe RailsMagicRenamer::Renamer do
     expect { RailsMagicRenamer::Renamer.new("DummyFromDoesExist", "DummyToDoesExist") }.to raise_error("The object you are trying to rename to already exists.")
   end
 
+  it "Should be able to access microposts!" do
+    expect(Micropost).to respond_to(:from_users_followed_by)
+  end
+
 end
