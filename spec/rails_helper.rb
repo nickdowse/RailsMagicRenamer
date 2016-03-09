@@ -3,6 +3,8 @@ require 'factory_girl'
 require 'factory_girl_rails'
 require 'support/sample_app_rails_4/config/environment'
 require 'rspec/rails'
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
 
 # ActiveRecord::Migration.maintain_test_schema!
 
