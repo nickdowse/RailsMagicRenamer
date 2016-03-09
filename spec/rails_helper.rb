@@ -1,10 +1,6 @@
 require 'rails/all'
-
 require 'factory_girl'
 require 'factory_girl_rails'
-
-
-
 require 'support/sample_app_rails_4/config/environment'
 require 'rspec/rails'
 
@@ -23,5 +19,6 @@ require 'spec_helper'
 
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
+  config.expose_current_running_example_as :example
   config.include Capybara::DSL
 end
