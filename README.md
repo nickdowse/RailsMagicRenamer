@@ -1,3 +1,5 @@
+[![Build Status](https://img.shields.io/travis/USER/REPO.svg)](https://travis-ci.org/pressdoc/table_importer)
+
 # RAILS MAGIC RENAMER
 
 This repository is currently a work in progress, until the time that it's ready check out [https://github.com/jcrisp/rails_refactor](https://github.com/jcrisp/rails_refactor) for the original work.
