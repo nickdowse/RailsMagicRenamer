@@ -68,11 +68,11 @@ module RailsMagicRenamer
       
 
       # move model file
-      `mv app/models/#{@from.underscore}.rb app/models/#{to_model_file}` # here test for success?
+      `mv app/models/#{@from.to_s.underscore}.rb app/models/#{to_model_file}` # here test for success?
       # move model container file (eg app/models/companies/*.rb)
-      `mv app/models/#{@from.underscore} app/models/#{@to.underscore}`
+      `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
 
-      replace_in_file("app/models/#{to_model_file}", @from, @to)
+      replace_in_file("app/models/#{to_model_file}", @from.to_s, @to.to_s)
 
     end
 
