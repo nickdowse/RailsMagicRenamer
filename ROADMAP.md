@@ -18,10 +18,10 @@ Here --^ look for all associations and check the type of the caller. Not strictl
 * Change model file name (campaign.rb -> distribution.rb) - Yes
 * Update model folder (if necessary) (models/campaigns/.rb -> models/distributions/.rb) - Yes
 * Update class reference (class Campaign -> class Distribution) - Yes
-* Update has_one/has_many/belongs_to relationships (eg has_many :campaigns -> has_many :distributions) - Scaffolded
-* Update :through relationships - Scaffolded
-* Update relationships in classes that have a relationship with from - Scaffolded
-* Update all classes that inherit from Campaign (class EmailCampign < Campaign -> class EmailCampaign < Distribution) - Scaffolded
+* Update has_one/has_many/belongs_to relationships (eg has_many :campaigns -> has_many :distributions) - Yes
+* Update :through relationships - Yes
+* Update relationships in classes that have a relationship with from - Yes
+* Update all classes that inherit from Campaign (class EmailCampign < Campaign -> class EmailCampaign < Distribution) - Yes
 
 ### Global checks
 * Change all references to that file (Campaign.blah_blah_blah -> Distribution.blah_blah_blah) (Global find and replace of `Campaign` to `Distribution`)

@@ -98,6 +98,9 @@ module RailsMagicRenamer
         puts "Descendant!"
         puts descendant.to_yaml
         puts "================================"
+        if File.exist?("app/models/#{relation.name.to_s}.rb")
+          replace("app/models/#{relation.name.to_s}.rb")
+        end
       end
     end
 
