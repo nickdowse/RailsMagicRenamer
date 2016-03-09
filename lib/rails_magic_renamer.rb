@@ -51,6 +51,9 @@ module RailsMagicRenamer
     # one entry point
     def rename
       Rails.application.eager_load!
+      @from = Object.const_get(@from)
+      @to = Object.const_set(@to, Class.new)
+      puts @to
       model_rename
       # controller_rename
     end
