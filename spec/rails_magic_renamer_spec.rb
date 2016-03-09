@@ -4,7 +4,7 @@ require 'rails_helper'
 describe RailsMagicRenamer::Renamer do
 
   it "creates a valid renamer object" do
-    renamer = RailsMagicRenamer::Renamer.new("Micropost", "Macropost")
+    renamer = RailsMagicRenamer::Renamer.new("Micropost", "Marcopost")
     expect(renamer).to be_kind_of(RailsMagicRenamer::Renamer)
   end
 

@@ -11,7 +11,7 @@ module RailsMagicRenamer
       from = from.to_s if !from.class != String
       to = to.to_s if !to.class != String
       @from, @to = from, to
-      FileUtils.cd('spec/support/sample_app_rails_4') if in_test_mode?
+      FileUtils.cd('spec/support/sample_app_rails_4') if File.exist?('rails_magic_renamer.gemspec')
       Rails.application.eager_load!
       begin
         valid_renamer?
@@ -72,8 +72,7 @@ module RailsMagicRenamer
         `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
       end
 
-      replace_in_file("app/models/#{to_model_file}", @from.to_s, @to.to_s)
-      replace_in_file("app/models/#{to_model_file}", @from.to_s.underscore, @to.to_s.underscore)
+      replace("app/models/#{to_model_file}")
 
     end
 
@@ -91,6 +90,10 @@ module RailsMagicRenamer
         puts "=================="
         puts relation.to_yaml
         puts "==================="
+        if File.exist?("app/models/#{relation.name}.rb")
+          puts "Finding and replacing!"
+          replace("app/models/#{relation.name}.rb")
+        end
       end
     end
 
@@ -142,6 +145,11 @@ module RailsMagicRenamer
     #   @from_resource_path = @from_resource_name.underscore
     # end
 
+    def replace(file_name)
+      replace_in_file(file_name, @from.to_s, @to.to_s)
+      replace_in_file(file_name, @from.to_s.underscore, @to.to_s.underscore)
+    end
+
     def replace_in_file(path, find, replace)
       contents = File.read(path)
       contents.gsub!(find, replace)
@@ -150,7 +158,9 @@ module RailsMagicRenamer
 
     def in_test_mode?
       return @in_test_mode if @in_test_mode.present?
-      @in_test_mode = `ls . | grep rails_magic_renamer`.present?
+      @in_test_mode = File.exist?('./rails_magic_renamer.gemspec') || File.exist?('../../../rails_magic_renamer.gemspec')
+      puts "In test mode: #{@in_test_mode}"
+      return @in_test_mode
     end
   end
 end

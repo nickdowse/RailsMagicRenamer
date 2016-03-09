@@ -30,7 +30,7 @@ describe Micropost do
   it "should be able to move a model" do
     RailsMagicRenamer::Renamer.new("Micropost", "Macropost").rename
     # undo changes
-    `git checkout -- .`
+    # `git checkout -- .`
     FileUtils.cd('../../../')
     puts `cat spec/support/sample_app_rails_4/app/models/macropost.rb`
     `rm spec/support/sample_app_rails_4/app/models/macropost.rb`
