@@ -66,7 +66,7 @@ module RailsMagicRenamer
       # move model file
       puts "Pathname exists?"
       puts Pathname.new("app/models/#{@from.to_s.underscore}.rb")
-      puts `ls . | grep rails_magic_renamer`
+      puts `ls . | grep rails_magic_renamer`.present?
       `mv app/models/#{@from.to_s.underscore}.rb app/models/#{to_model_file}` # here test for success?
       # move model container file (eg app/models/companies/*.rb)
       `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
