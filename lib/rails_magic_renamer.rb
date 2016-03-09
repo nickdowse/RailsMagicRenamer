@@ -66,6 +66,8 @@ module RailsMagicRenamer
       # move model file
       puts "Pathname exists?"
       puts `ls . | grep rails_magic_renamer`.present?
+      FileUtils.cd('spec/support/sample_app_rails_4') if in_test_mode?
+      puts `ls . | grep rails_magic_renamer`.present?
       `mv app/models/#{@from.to_s.underscore}.rb app/models/#{to_model_file}` # here test for success?
       # move model container file (eg app/models/companies/*.rb)
       `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
@@ -143,6 +145,10 @@ module RailsMagicRenamer
       contents = File.read(path)
       contents.gsub!(find, replace)
       File.open(path, "w+") { |f| f.write(contents) }
+    end
+
+    def in_test_mode?
+      `ls . | grep rails_magic_renamer`.present?
     end
   end
 end
