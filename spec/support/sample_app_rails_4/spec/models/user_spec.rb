@@ -3,7 +3,7 @@ require 'rails_helper'
 describe User do
 
   before do
-    @user = User.new(name: "Example User", email: "user@example.com",
+    @user = User.new(name: "Example User", email: "user#{rand(100000)}@example.com",
                      password: "foobar", password_confirmation: "foobar")
   end
 
@@ -87,7 +87,7 @@ describe User do
 
   describe "when password is not present" do
     before do
-      @user = User.new(name: "Example User", email: "user@example.com",
+      @user = User.new(name: "Example User", email: "user1@example.com",
                        password: " ", password_confirmation: " ")
     end
     it { should_not be_valid }
