@@ -12,12 +12,11 @@ module RailsMagicRenamer
       to = to.to_s if !to.class != String
       @from, @to = from, to
       Rails.application.eager_load!
-      puts ActiveRecord::Base.descendants
-      # begin
+      begin
         valid_renamer?
-      # rescue RenamerError => e
-      #   raise RailsMagicRenamer::InvalidObjectError.new(e.message)
-      # end
+      rescue RenamerError => e
+        raise RailsMagicRenamer::InvalidObjectError.new(e.message)
+      end
     end
 
 
@@ -35,13 +34,11 @@ module RailsMagicRenamer
     end
 
     def from_exists?
-      puts Object.const_defined?("#{@from}")
-      Object.const_defined?("#{@from}")
-      # return Object.const_get(@from) rescue false
+      return Object.const_defined?("#{@from}")
     end
 
     def to_exists?
-      Object.const_defined?(@to)
+      return Object.const_defined?(@to)
     end
 
     def in_root_directory?
@@ -53,7 +50,6 @@ module RailsMagicRenamer
       Rails.application.eager_load!
       @from = Object.const_get(@from)
       @to = Object.const_set(@to, Class.new)
-      puts @to
       model_rename
       # controller_rename
     end
@@ -70,7 +66,7 @@ module RailsMagicRenamer
       # move model file
       `mv app/models/#{@from.to_s.underscore}.rb app/models/#{to_model_file}` # here test for success?
       # move model container file (eg app/models/companies/*.rb)
-      `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
+      `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}.rb`
 
       replace_in_file("app/models/#{to_model_file}", @from.to_s, @to.to_s)
 
