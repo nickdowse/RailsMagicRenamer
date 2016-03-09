@@ -5,17 +5,19 @@ require 'active_support/core_ext/string/inflections'
 
 module RailsMagicRenamer
 
-  # called from rails console: RailsMagicRenamer::Renamer.new("ModelOne", "ModelTwo").rename
+  # called from rails console: RailsMagicRenamer::Renamer.new(ModelOne, ModelTwo).rename
   class Renamer
     def initialize(from, to)
       from = from.to_s if !from.class != String
       to = to.to_s if !to.class != String
       @from, @to = from, to
-      begin
+      Rails.application.eager_load!
+      puts ActiveRecord::Base.descendants
+      # begin
         valid_renamer?
-      rescue RenamerError => e
-        raise RailsMagicRenamer::InvalidObjectError.new(e.message)
-      end
+      # rescue RenamerError => e
+      #   raise RailsMagicRenamer::InvalidObjectError.new(e.message)
+      # end
     end
 
 
@@ -33,11 +35,13 @@ module RailsMagicRenamer
     end
 
     def from_exists?
-      return Object.const_get(@from) rescue false
+      puts Object.const_defined?("#{@from}")
+      Object.const_defined?("#{@from}")
+      # return Object.const_get(@from) rescue false
     end
 
     def to_exists?
-      return Object.const_get(@to) rescue false
+      Object.const_defined?(@to)
     end
 
     def in_root_directory?
@@ -46,6 +50,7 @@ module RailsMagicRenamer
 
     # one entry point
     def rename
+      Rails.application.eager_load!
       model_rename
       # controller_rename
     end
@@ -55,7 +60,6 @@ module RailsMagicRenamer
       `git add -A && git commit -m "Code before RailsMagicRenamer renaming"` if !`git status | grep "On branch"`.empty?
       to_model_file = @to.underscore + ".rb"
 
-      Rails.application.eager_load!
       rename_relations
       rename_descendants
       
@@ -77,8 +81,12 @@ module RailsMagicRenamer
       # if not, check if the class name specified is different.
       # if the class name is different, then get that, underscore it, and try that file.
       # if it exists, replace replace replace!
+      puts "Renaming relations!"
+      puts relations.to_yaml
       relations.each do |relation|
-
+        puts "=================="
+        puts relation.to_yaml
+        puts "==================="
       end
     end
 

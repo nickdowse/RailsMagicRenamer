@@ -24,5 +24,4 @@ describe RailsMagicRenamer::Renamer do
   it "Should be able to access microposts!" do
     expect(Micropost).to respond_to(:from_users_followed_by)
   end
-
 end
