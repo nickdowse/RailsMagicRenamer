@@ -78,21 +78,11 @@ module RailsMagicRenamer
 
     def rename_relations
       relations = @from.reflect_on_all_associations
-      # each relation...
-      # check whether there is a file where we expect it to be (eg app/models/#{relation.name.to_s.singularize}.rb)
-      # if so, find and replace the @from in that file
-      # if not, check if the class name specified is different.
-      # if the class name is different, then get that, underscore it, and try that file.
-      # if it exists, replace replace replace!
-      puts "Renaming relations!"
-      puts relations.to_yaml
       relations.each do |relation|
-        puts "=================="
-        puts relation.to_yaml
-        puts "==================="
         if File.exist?("app/models/#{relation.name}.rb")
-          puts "Finding and replacing!"
           replace("app/models/#{relation.name}.rb")
+        elsif relation.class_name.to_s.underscore != relation.name.to_s && File.exist?("app/models/#{relation.class_name.to_s.underscore}.rb")
+          replace("app/models/#{relation.class_name.to_s.underscore}.rb")
         end
       end
     end
@@ -104,7 +94,10 @@ module RailsMagicRenamer
       # if so replace in file
       # rename file if it matches the rename criteria
       descendants.each do |descendant|
-
+        puts "================================"
+        puts "Descendant!"
+        puts descendant.to_yaml
+        puts "================================"
       end
     end
 
@@ -151,6 +144,7 @@ module RailsMagicRenamer
     end
 
     def replace_in_file(path, find, replace)
+      return false if !File.exist?(path)
       contents = File.read(path)
       contents.gsub!(find, replace)
       File.open(path, "w+") { |f| f.write(contents) }
@@ -159,7 +153,6 @@ module RailsMagicRenamer
     def in_test_mode?
       return @in_test_mode if @in_test_mode.present?
       @in_test_mode = File.exist?('./rails_magic_renamer.gemspec') || File.exist?('../../../rails_magic_renamer.gemspec')
-      puts "In test mode: #{@in_test_mode}"
       return @in_test_mode
     end
   end
