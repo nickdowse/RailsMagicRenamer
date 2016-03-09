@@ -144,6 +144,7 @@ module RailsMagicRenamer
     # end
 
     def replace_in_file(path, find, replace)
+      puts "nxcvnmndsfks"
       contents = File.read(path)
       contents.gsub!(find, replace)
       File.open(path, "w+") { |f| f.write(contents) }
