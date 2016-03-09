@@ -28,7 +28,6 @@ describe Micropost do
     it { should_not be_valid }
   end
   it "should be able to move a model" do
-    puts "Renaming model?"
     puts RailsMagicRenamer::Renamer.new("Micropost", "Macropost").rename
   end
 end

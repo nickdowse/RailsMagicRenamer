@@ -11,6 +11,7 @@ module RailsMagicRenamer
       from = from.to_s if !from.class != String
       to = to.to_s if !to.class != String
       @from, @to = from, to
+      FileUtils.cd('spec/support/sample_app_rails_4') if in_test_mode?
       Rails.application.eager_load!
       begin
         valid_renamer?
@@ -66,11 +67,12 @@ module RailsMagicRenamer
       # move model file
       puts "Pathname exists?"
       puts `ls . | grep rails_magic_renamer`.present?
-      FileUtils.cd('spec/support/sample_app_rails_4') if in_test_mode?
       puts `ls . | grep rails_magic_renamer`.present?
       `mv app/models/#{@from.to_s.underscore}.rb app/models/#{to_model_file}` # here test for success?
       # move model container file (eg app/models/companies/*.rb)
-      `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
+      if File.directory?(@from.to_s.underscore)
+        `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
+      end
 
       replace_in_file("app/models/#{to_model_file}", @from.to_s, @to.to_s)
 
