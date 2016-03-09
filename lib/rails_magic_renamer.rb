@@ -65,16 +65,15 @@ module RailsMagicRenamer
       
 
       # move model file
-      puts "Pathname exists?"
-      puts `ls . | grep rails_magic_renamer`.present?
-      puts `ls . | grep rails_magic_renamer`.present?
       `mv app/models/#{@from.to_s.underscore}.rb app/models/#{to_model_file}` # here test for success?
+      
       # move model container file (eg app/models/companies/*.rb)
       if File.directory?(@from.to_s.underscore)
         `mv app/models/#{@from.to_s.underscore} app/models/#{@to.to_s.underscore}`
       end
 
       replace_in_file("app/models/#{to_model_file}", @from.to_s, @to.to_s)
+      replace_in_file("app/models/#{to_model_file}", @from.to_s.underscore, @to.to_s.underscore)
 
     end
 
@@ -144,7 +143,6 @@ module RailsMagicRenamer
     # end
 
     def replace_in_file(path, find, replace)
-      puts "nxcvnmndsfks"
       contents = File.read(path)
       contents.gsub!(find, replace)
       File.open(path, "w+") { |f| f.write(contents) }
