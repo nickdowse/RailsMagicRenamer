@@ -32,7 +32,7 @@ describe Micropost do
     # undo changes
     `git checkout -- .`
     FileUtils.cd('../../../')
-    `cat spec/support/sample_app_rails_4/app/models/macropost.rb`
+    puts `cat spec/support/sample_app_rails_4/app/models/macropost.rb`
     `rm spec/support/sample_app_rails_4/app/models/macropost.rb`
   end
 end
