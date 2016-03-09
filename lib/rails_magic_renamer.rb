@@ -61,7 +61,7 @@ module RailsMagicRenamer
     def model_rename
       # commit any changes to git if is uncommitted and git is installed
       `git add -A && git commit -m "Code before RailsMagicRenamer renaming"` if !`git status | grep "On branch"`.empty?
-      to_model_file = @to.underscore + ".rb"
+      to_model_file = @to.to_s.underscore + ".rb"
 
       rename_relations
       rename_descendants
