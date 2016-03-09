@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/travis/USER/REPO.svg)](https://travis-ci.org/pressdoc/table_importer)
+[![Build Status](https://img.shields.io/travis/nickdowse/rails_magic_renamer.svg)](https://travis-ci.org/nickdowse/rails_magic_renamer)
 
 # RAILS MAGIC RENAMER
 
