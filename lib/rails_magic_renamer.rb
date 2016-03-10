@@ -5,7 +5,7 @@ require 'active_support/core_ext/string/inflections'
 
 module RailsMagicRenamer
 
-  # called from rails console: RailsMagicRenamer::Renamer.new(ModelOne, ModelTwo).rename
+  # called from rails console: RailsMagicRenamer::Renamer.new("ModelOne", "ModelTwo").rename
   class Renamer
     def initialize(from, to)
       from = from.to_s if !from.class != String
@@ -19,7 +19,6 @@ module RailsMagicRenamer
         raise RailsMagicRenamer::InvalidObjectError.new(e.message)
       end
     end
-
 
     # check that models can be renamed
     def valid_renamer?

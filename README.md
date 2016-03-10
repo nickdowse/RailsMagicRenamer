@@ -4,21 +4,22 @@
 
 This repository is currently a work in progress, until the time that it's ready check out [https://github.com/jcrisp/rails_refactor](https://github.com/jcrisp/rails_refactor) for the original work. For a view of the direction this gem is going take a look at the ROADMAP.md. A quick overview: this gem aims to be an all in one set and forget gem for renaming models in rails projects, meaning you can pass it the model name you have, the model name you want it to be and it will rename files, rename models, update relationships, rename controllers, views, instances of the class, create new database migrations, and update the specs. Sounds scary? It won't run any DB migrations, so you can set it, and then if it works just commit the changes to source control and you're away.
 
-Basic renames and refactorings for rails projects.
+### Basic renames and refactorings for rails projects.
 Although these are not perfect, they'll do a lot of the work for you 
 and save you time. 
 
-Before using, recommend that you start from a clean repository state so 
+Before using, I recommend that you start from a clean repository state so 
 you can easily review changes.
 
 To install:
-  `gem install rails_magic_renamer`
+    `gem install rails_magic_renamer`
 
 Before use, make sure you cd to the root of your rails project.
 
 To rename a controller open up `rails console` and run:
 
-  `RailsMagicRenamer::Renamer.new("from_model", "to_model").rename`
+    `require 'rails_magic_renamer'`
+    `RailsMagicRenamer::Renamer.new("from_model", "to_model").rename`
 
 This will:
 
@@ -30,6 +31,22 @@ This will:
 * rename the model file & class name in file
 * rename the spec file & class name in file
 * rename the migration & class name & table names in file
+
+# Contributing
+
+We love your contributions to RailsMagicRenamer. Before submitting a pull request, please make sure that your changes are well tested.
+
+Then, you'll need to install bundler and the gem dependencies:
+
+  `gem install bundler && bundle install`
+
+  You should now be able to run the local tests:
+
+    `bundle exec rake`
+
+Interact with rails_magic_renamer by creating a RailsMagicRenamer instance, and then calling `rename` on that instance.
+  
+    `RailsMagicRenamer::Renamer.new("CurrentModelName", "NewModelName").rename`
 
 Started by James Crisp & Ryan Bigg pairing at RORO hack night 24 Nov 2010.
 Thanks to Andrew Snow for help with Gemification.
