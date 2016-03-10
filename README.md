@@ -18,10 +18,10 @@ To install:
 
 Before use, make sure you cd to the root of your rails project.
 
-To rename a controller open up `rails console` and run:
+To rename an object open up `rails console` and run:
 
-    `require 'rails_magic_renamer'`
-    `RailsMagicRenamer::Renamer.new("from_model", "to_model").rename`
+    require 'rails_magic_renamer'
+    RailsMagicRenamer::Renamer.new("from_model", "to_model").rename
 
 This will:
 
@@ -44,11 +44,11 @@ Then, you'll need to install bundler and the gem dependencies:
 
   You should now be able to run the local tests:
 
-    `bundle exec rake`
+    bundle exec rake
 
 Interact with rails_magic_renamer by creating a RailsMagicRenamer instance, and then calling `rename` on that instance.
   
-    `RailsMagicRenamer::Renamer.new("CurrentModelName", "NewModelName").rename`
+    RailsMagicRenamer::Renamer.new("CurrentModelName", "NewModelName").rename
 
 Started by James Crisp & Ryan Bigg pairing at RORO hack night 24 Nov 2010.
 Thanks to Andrew Snow for help with Gemification.
