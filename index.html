@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>RailsMagicRenamer by nickdowse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">RailsMagicRenamer</h1>
+      <h2 class="project-tagline">Comprehensive object renaming for Rails projects</h2>
+      <a href="https://github.com/nickdowse/RailsMagicRenamer" class="btn">View on GitHub</a>
+      <a href="https://github.com/nickdowse/RailsMagicRenamer/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/nickdowse/RailsMagicRenamer/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p><a href="https://travis-ci.org/nickdowse/rails_magic_renamer"><img src="https://img.shields.io/travis/nickdowse/rails_magic_renamer.svg" alt="Build Status"></a> <a href="https://codeclimate.com/github/nickdowse/rails_magic_renamer"><img src="https://codeclimate.com/github/nickdowse/rails_magic_renamer/badges/gpa.svg" alt="Code Climate"></a> 
+<a href="https://codeclimate.com/github/nickdowse/rails_magic_renamer/coverage"><img src="https://codeclimate.com/github/nickdowse/rails_magic_renamer/badges/coverage.svg" alt="Test Coverage"></a></p>
+
+<h1>
+<a id="rails-magic-renamer" class="anchor" href="#rails-magic-renamer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RAILS MAGIC RENAMER</h1>
+
+<p>This repository is currently a work in progress, until the time that it's ready check out <a href="https://github.com/jcrisp/rails_refactor">https://github.com/jcrisp/rails_refactor</a> for the original work. For a view of the direction this gem is going take a look at the ROADMAP.md. A quick overview: this gem aims to be an all in one set and forget gem for renaming models in rails projects, meaning you can pass it the model name you have, the model name you want it to be and it will rename files, rename models, update relationships, rename controllers, views, instances of the class, create new database migrations, and update the specs. Sounds scary? It won't run any DB migrations, so you can set it, and then if it works just commit the changes to source control and you're away.</p>
+
+<h3>
+<a id="basic-renames-and-refactorings-for-rails-projects" class="anchor" href="#basic-renames-and-refactorings-for-rails-projects" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic renames and refactorings for rails projects.</h3>
+
+<p>Although these are not perfect, they'll do a lot of the work for you 
+and save you time. </p>
+
+<p>Before using, I recommend that you start from a clean repository state so 
+you can easily review changes.</p>
+
+<p>To install:
+    <code>gem install rails_magic_renamer</code></p>
+
+<p>Before use, make sure you cd to the root of your rails project.</p>
+
+<p>To rename an object open up <code>rails console</code> and run:</p>
+
+<pre><code>require 'rails_magic_renamer'
+RailsMagicRenamer::Renamer.new("from_model", "to_model").rename
+</code></pre>
+
+<p>This will:</p>
+
+<ul>
+<li>rename the controller file &amp; class name in file</li>
+<li>rename the controller spec file &amp; class name in file</li>
+<li>rename the view directory</li>
+<li>rename the helper file &amp; module name in file</li>
+<li>updates routes</li>
+<li>rename the model file &amp; class name in file</li>
+<li>rename the spec file &amp; class name in file</li>
+<li>rename the migration &amp; class name &amp; table names in file</li>
+</ul>
+
+<h1>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h1>
+
+<p>We love your contributions to RailsMagicRenamer. Before submitting a pull request, please make sure that your changes are well tested.</p>
+
+<p>Then, you'll need to install bundler and the gem dependencies:</p>
+
+<p><code>gem install bundler &amp;&amp; bundle install</code></p>
+
+<p>You should now be able to run the local tests:</p>
+
+<pre><code>bundle exec rake
+</code></pre>
+
+<p>Interact with rails_magic_renamer by creating a RailsMagicRenamer instance, and then calling <code>rename</code> on that instance.</p>
+
+<pre><code>RailsMagicRenamer::Renamer.new("CurrentModelName", "NewModelName").rename
+</code></pre>
+
+<p>Started by James Crisp &amp; Ryan Bigg pairing at RORO hack night 24 Nov 2010.
+Thanks to Andrew Snow for help with Gemification.</p>
+
+<p>Thanks to Tricon for some improvements and start on TextMate Bundle:
+<a href="https://github.com/Tricon/rails-refactor.tmbundle">https://github.com/Tricon/rails-refactor.tmbundle</a></p>
+
+<p>Any questions open an issue or hit me up on Twitter: <a href="https://twitter.com/nmdowse">@nmdowse</a>.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/nickdowse/RailsMagicRenamer">RailsMagicRenamer</a> is maintained by <a href="https://github.com/nickdowse">nickdowse</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
