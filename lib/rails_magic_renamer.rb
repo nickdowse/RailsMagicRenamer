@@ -45,7 +45,7 @@ module RailsMagicRenamer
       File.exist?('./config/environment.rb')
     end
 
-    # one entry point
+    # only entry point
     def rename
       Rails.application.eager_load!
       @from = Object.const_get(@from)
@@ -83,6 +83,29 @@ module RailsMagicRenamer
         elsif relation.class_name.to_s.underscore != relation.name.to_s && File.exist?("app/models/#{relation.class_name.to_s.underscore}.rb")
           replace("app/models/#{relation.class_name.to_s.underscore}.rb")
         end
+
+        if relation.macro == :belongs_to
+          puts "Relation macro is a belongs_to, don't need to do anything"
+        elsif relation.macro == :has_many
+          puts "Relation macro #{relation.name} is a has_many updating the foreign key here"
+
+          if !relation.options.has_key?(:through)
+            # this is a simple has_many relationship
+            # can update the key
+          else
+            # has_many, through
+          end
+        else
+          puts "Why in here? #{relation.macro}"
+        end
+
+        # here create migration files as well
+        # for each relation
+        # if it's a belongs_to then there's nothing that needs to change.
+        # if it's a has_many and the foreign key is not in the options then update the
+        # foreign key/column name of the name model_id, if the foreign key is specified then update that.
+        # then create a migration on the model that belongs to it to rename the foreign key
+
       end
     end
 
@@ -93,10 +116,6 @@ module RailsMagicRenamer
       # if so replace in file
       # rename file if it matches the rename criteria
       descendants.each do |descendant|
-        puts "================================"
-        puts "Descendant!"
-        puts descendant.to_yaml
-        puts "================================"
         if File.exist?("app/models/#{relation.name.to_s}.rb")
           replace("app/models/#{relation.name.to_s}.rb")
         end
@@ -148,8 +167,8 @@ module RailsMagicRenamer
     def replace_in_file(path, find, replace)
       return false if !File.exist?(path)
       contents = File.read(path)
-      contents.gsub!(find, replace)
-      File.open(path, "w+") { |f| f.write(contents) }
+      replaced_contents = contents.gsub(/\b#{Regexp.escape(find)}\b/, replace).gsub(/\b#{Regexp.escape("#{find}s")}\b/, "#{replace}s").gsub(/\b#{Regexp.escape("#{find}_id")}\b/, "#{replace}_id")
+      File.open(path, "w+") { |f| f.write(replaced_contents) }
     end
 
     def in_test_mode?

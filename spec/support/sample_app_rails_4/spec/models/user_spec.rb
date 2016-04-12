@@ -98,6 +98,15 @@ describe User do
     it { should be_invalid }
   end
 
+  it "should be able to move a model" do
+    RailsMagicRenamer::Renamer.new("User", "Poster").rename
+    # undo changes
+    # `git checkout -- .`
+    FileUtils.cd('../../../')
+    puts `cat spec/support/sample_app_rails_4/app/models/poster.rb`
+    `rm spec/support/sample_app_rails_4/app/models/poster.rb`
+  end
+
   # describe "return value of authenticate method" do
   #   before { @user.save }
   #   let(:found_user) { User.find_by(email: @user.email) }

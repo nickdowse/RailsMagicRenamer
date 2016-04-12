@@ -27,12 +27,4 @@ describe Micropost do
     before { @micropost.content = "a" * 141 }
     it { should_not be_valid }
   end
-  it "should be able to move a model" do
-    RailsMagicRenamer::Renamer.new("Micropost", "Macropost").rename
-    # undo changes
-    # `git checkout -- .`
-    FileUtils.cd('../../../')
-    puts `cat spec/support/sample_app_rails_4/app/models/macropost.rb`
-    `rm spec/support/sample_app_rails_4/app/models/macropost.rb`
-  end
 end
