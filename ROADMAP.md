@@ -43,9 +43,9 @@ Here --^ look for all associations and check the type of the caller. Not strictl
 * Update URLs (edit_manage_organisation_pressroom_pressdoc_campaign_url -> edit_manage_organisation_pressroom_pressdoc_distribution_url)
 
 ### Database checks
-* Create rename_table migration for main model table
-* Create rename_table migration for all relevant pivot/join tables
-* Create migration to rename foreign keys (eg email.campaign_id -> email.distribution_id)
+* Create rename_table migration for main model table - Yes
+* Create rename_table migration for all relevant pivot/join tables - Yes
+* Create migration to rename foreign keys (eg email.campaign_id -> email.distribution_id) - Yes
 * Run migrations
 
 # Spec checks

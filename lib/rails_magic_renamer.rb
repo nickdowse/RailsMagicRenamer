@@ -106,7 +106,7 @@ module RailsMagicRenamer
               if Object.const_defined?(relation.class_name) && Object.const_get(relation.class_name).column_names.include?("#{@from.to_s.underscore}_id")
                 generate_rename_column_migration(relation, "#{@from.to_s.underscore}_id")
               end
-              generate_rename_table_migration(relation)
+              generate_rename_table_migration_from_relation(relation)
             else
               # here create a migration to rename user_id if user_id exists
               if Object.const_defined?(relation.class_name) && Object.const_get(relation.class_name).column_names.include?("#{@from.to_s.underscore}_id")
@@ -129,9 +129,10 @@ module RailsMagicRenamer
           # could be a has_one relationship?
         end
       end
+      generate_rename_table_migration(@from.table_name, @to.to_s.underscore.pluralize)
     end
 
-    def generate_rename_table_migration(relation)
+    def generate_rename_table_migration_from_relation(relation)
       class_name = "Rename#{relation.class_name}"
       file_contents = "class #{class_name} < ActiveRecord::Migration
   def change
@@ -148,6 +149,18 @@ end
       file_contents = "class #{class_name} < ActiveRecord::Migration
   def change
     rename_column :#{relation.plural_name}, :#{column_name}, :#{column_name.gsub(@from.to_s.underscore, @to.to_s.underscore)}
+  end
+end
+"
+      File.open("db/migrate/#{@@timestamp}_#{class_name.underscore}.rb", 'w') {|f| f.write(file_contents) }
+      @@timestamp = @@timestamp + 1
+    end
+
+    def generate_rename_table_migration(from, to)
+      class_name = "Rename#{from}To#{to}"
+      file_contents = "class #{class_name} < ActiveRecord::Migration
+  def change
+    rename_table :#{from}, :#{to}
   end
 end
 "
