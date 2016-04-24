@@ -23,12 +23,11 @@ Here --^ look for all associations and check the type of the caller. Not strictl
 * Update relationships in classes that have a relationship with from - Yes
 * Update all classes that inherit from Campaign (class EmailCampign < Campaign -> class EmailCampaign < Distribution) - Yes
 
-### Global checks
-* Change all references to that file (Campaign.blah_blah_blah -> Distribution.blah_blah_blah) (Global find and replace of `Campaign` to `Distribution`)
-* Global find and replace of lower_case `campaign` to `distribution`
-- Here make certain to skip database folder
-- This will Change all references from model -> model (@pressdoc.campaigns -> @pressdoc.distributions) -> Similar to above where it takes the file and replaces all instances of 'campaigns' with 'campaign'. It will also update instance variables (@campaign -> @distribution)
-
+### Database checks
+* Create rename_table migration for main model table - Yes
+* Create rename_table migration for all relevant pivot/join tables - Yes
+* Create migration to rename foreign keys (eg email.campaign_id -> email.distribution_id) - Yes
+* Run migrations
 
 ### View checks
 * Update view folder (views/campaigns/* -> views/distributions/*)
@@ -42,11 +41,11 @@ Here --^ look for all associations and check the type of the caller. Not strictl
 * Update paths (edit_manage_organisation_pressroom_pressdoc_campaign_path -> edit_manage_organisation_pressroom_pressdoc_distribution_path)
 * Update URLs (edit_manage_organisation_pressroom_pressdoc_campaign_url -> edit_manage_organisation_pressroom_pressdoc_distribution_url)
 
-### Database checks
-* Create rename_table migration for main model table - Yes
-* Create rename_table migration for all relevant pivot/join tables - Yes
-* Create migration to rename foreign keys (eg email.campaign_id -> email.distribution_id) - Yes
-* Run migrations
+### Global checks
+* Change all references to that file (Campaign.blah_blah_blah -> Distribution.blah_blah_blah) (Global find and replace of `Campaign` to `Distribution`)
+* Global find and replace of lower_case `campaign` to `distribution`
+- Here make certain to skip database folder
+- This will Change all references from model -> model (@pressdoc.campaigns -> @pressdoc.distributions) -> Similar to above where it takes the file and replaces all instances of 'campaigns' with 'campaign'. It will also update instance variables (@campaign -> @distribution)
 
 # Spec checks
 * Update specs (campaign_spec.rb -> distribution_spec.rb)
