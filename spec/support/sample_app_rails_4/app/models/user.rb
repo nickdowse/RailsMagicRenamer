@@ -10,6 +10,8 @@ class User < ActiveRecord::Base
   has_many :user_comments
   has_many :comments, through: :user_comments
 
+  belongs_to :organisation
+
   before_save { self.email = email.downcase }
   before_create :create_remember_token
   validates :name, presence: true, length: { maximum: 50 }
