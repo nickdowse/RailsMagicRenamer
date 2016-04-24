@@ -7,12 +7,17 @@ module RailsMagicRenamer
 
   # called from rails console: RailsMagicRenamer::Renamer.new("ModelOne", "ModelTwo").rename
   class Renamer
+
+    @@timestamp
+
     def initialize(from, to)
       from = from.to_s if !from.class != String
       to = to.to_s if !to.class != String
       @from, @to = from, to
       FileUtils.cd('spec/support/sample_app_rails_4') if File.exist?('rails_magic_renamer.gemspec')
       Rails.application.eager_load!
+
+      @@timestamp = Time.now.strftime("%Y%m%d%H%M%S").to_i
       begin
         valid_renamer?
       rescue RenamerError => e
@@ -83,20 +88,13 @@ module RailsMagicRenamer
         elsif relation.class_name.to_s.underscore != relation.name.to_s && File.exist?("app/models/#{relation.class_name.to_s.underscore}.rb")
           replace("app/models/#{relation.class_name.to_s.underscore}.rb")
         end
-        puts "======================="
         if relation.macro == :belongs_to
-
-          # eg user belongs to organisation
-          # user has an organisation_id field, which can stay the same
-          # In the organisation.rb the has_many needs to be updated
-          # in the organisation.rb file do a find and replace on 'users' -> Done above
-
           puts "Relation macro #{relation.name} is a has_many updating the foreign key here"
         elsif relation.macro == :has_many
           puts "Relation macro #{relation.name} is a has_many updating the foreign key here"
-          pp relation.options
           if !relation.options.has_key?(:through)
             # renaming the through relationship here
+            # if relation is UserComment etc (eg a join table)
             if relation.class_name.to_s.match(@from.to_s) && File.exist?("app/models/#{relation.class_name.underscore}.rb")
               # replace user with poster in user_comments.rb
               replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
@@ -104,33 +102,57 @@ module RailsMagicRenamer
               replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
               # move user_comments.rb -> poster_comments.rb
               `mv "app/models/#{relation.class_name.underscore}.rb" app/models/#{relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore)}.rb`
+              # here create migration to rename table
+              if Object.const_defined?(relation.class_name) && Object.const_get(relation.class_name).column_names.include?("#{@from.to_s.underscore}_id")
+                generate_rename_column_migration(relation, "#{@from.to_s.underscore}_id")
+              end
+              generate_rename_table_migration(relation)
+            else
+              # here create a migration to rename user_id if user_id exists
+              if Object.const_defined?(relation.class_name) && Object.const_get(relation.class_name).column_names.include?("#{@from.to_s.underscore}_id")
+                generate_rename_column_migration(relation, "#{@from.to_s.underscore}_id")
+              end
             end
           else
             # renaming the actual relationship here
-            puts "Has many, through"
-            puts relation.options[:through]
+            puts "Has many, through #{relation.options[:through]}"
             if File.exist?("app/models/#{relation.class_name.underscore}.rb")
               # replace user_comments -> poster_comments in comments.rb
               replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.options[:through].to_s, relation.options[:through].to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
               # replace followed_users -> followed_posters in user.rb
               replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
             end
-            # has_many, through
           end
-          puts "======================="
-
         else
           puts "Why in here? #{relation.macro}"
+          puts "#{relation.macro} type relationships are not supported to be renamed right now."
+          # could be a has_one relationship?
         end
-
-        # here create migration files as well
-        # for each relation
-        # if it's a belongs_to then there's nothing that needs to change.
-        # if it's a has_many and the foreign key is not in the options then update the
-        # foreign key/column name of the name model_id, if the foreign key is specified then update that.
-        # then create a migration on the model that belongs to it to rename the foreign key
-
       end
+    end
+
+    def generate_rename_table_migration(relation)
+      class_name = "Rename#{relation.class_name}"
+      file_contents = "class #{class_name} < ActiveRecord::Migration
+  def change
+    rename_table :#{relation.plural_name}, :#{relation.plural_name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore)}
+  end
+end
+"
+      File.open("db/migrate/#{@@timestamp}_#{class_name.underscore}.rb", 'w') {|f| f.write(file_contents) }
+      @@timestamp = @@timestamp + 1
+    end
+
+    def generate_rename_column_migration(relation, column_name)
+      class_name = "Rename#{relation.class_name}_#{column_name}"
+      file_contents = "class #{class_name} < ActiveRecord::Migration
+  def change
+    rename_column :#{relation.plural_name}, :#{column_name}, :#{column_name.gsub(@from.to_s.underscore, @to.to_s.underscore)}
+  end
+end
+"
+      File.open("db/migrate/#{@@timestamp}_#{class_name.underscore}.rb", 'w') {|f| f.write(file_contents) }
+      @@timestamp = @@timestamp + 1
     end
 
     def rename_descendants
