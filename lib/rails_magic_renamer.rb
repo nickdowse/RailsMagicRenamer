@@ -83,18 +83,42 @@ module RailsMagicRenamer
         elsif relation.class_name.to_s.underscore != relation.name.to_s && File.exist?("app/models/#{relation.class_name.to_s.underscore}.rb")
           replace("app/models/#{relation.class_name.to_s.underscore}.rb")
         end
-
+        puts "======================="
         if relation.macro == :belongs_to
-          puts "Relation macro is a belongs_to, don't need to do anything"
+
+          # eg user belongs to organisation
+          # user has an organisation_id field, which can stay the same
+          # In the organisation.rb the has_many needs to be updated
+          # in the organisation.rb file do a find and replace on 'users' -> Done above
+
+          puts "Relation macro #{relation.name} is a has_many updating the foreign key here"
         elsif relation.macro == :has_many
           puts "Relation macro #{relation.name} is a has_many updating the foreign key here"
-
+          pp relation.options
           if !relation.options.has_key?(:through)
-            # this is a simple has_many relationship
-            # can update the key
+            # renaming the through relationship here
+            if relation.class_name.to_s.match(@from.to_s) && File.exist?("app/models/#{relation.class_name.underscore}.rb")
+              # replace user with poster in user_comments.rb
+              replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+              # replace user_comments -> poster_comments in user.rb
+              replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+              # move user_comments.rb -> poster_comments.rb
+              `mv "app/models/#{relation.class_name.underscore}.rb" app/models/#{relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore)}.rb`
+            end
           else
+            # renaming the actual relationship here
+            puts "Has many, through"
+            puts relation.options[:through]
+            if File.exist?("app/models/#{relation.class_name.underscore}.rb")
+              # replace user_comments -> poster_comments in comments.rb
+              replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.options[:through].to_s, relation.options[:through].to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+              # replace followed_users -> followed_posters in user.rb
+              replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+            end
             # has_many, through
           end
+          puts "======================="
+
         else
           puts "Why in here? #{relation.macro}"
         end
