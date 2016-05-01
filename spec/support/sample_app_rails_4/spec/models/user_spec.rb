@@ -101,9 +101,8 @@ describe User do
   it "should be able to move a model" do
     RailsMagicRenamer::Renamer.new("User", "Poster").rename
     # undo changes
-    `git checkout -- .`
+    # `git checkout -- .`
+    # `git clean -f` # careful, this will remove all changes to gem dev progress
     FileUtils.cd('../../../')
-    puts `cat spec/support/sample_app_rails_4/app/models/poster.rb`
-    `rm spec/support/sample_app_rails_4/app/models/poster.rb`
   end
 end

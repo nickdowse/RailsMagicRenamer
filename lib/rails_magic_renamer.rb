@@ -55,11 +55,22 @@ module RailsMagicRenamer
       Rails.application.eager_load!
       @from = Object.const_get(@from)
       @to = Object.const_set(@to, Class.new)
-      model_rename
-      # controller_rename
+      # here prevent factory girl from linting factories
+      if !Dir.glob('**/factory_girl.rb').empty?
+        file = Dir.glob('**/factory_girl.rb').first
+        replace_in_file(file, "FactoryGirl.lint", "# FactoryGirl.lint")
+      end
+      rename_models
+      rename_controllers
+      rename_views
+      rename_helpers
+      rename_routes
+      rename_specs
+      rename_assets
+      rename_everything_else
     end
 
-    def model_rename
+    def rename_models
       # commit any changes to git if is uncommitted and git is installed
       `git add -A && git commit -m "Code before RailsMagicRenamer renaming"` if !`git status | grep "On branch"`.empty? && !in_test_mode?
       to_model_file = @to.to_s.underscore + ".rb"
@@ -89,7 +100,7 @@ module RailsMagicRenamer
           replace("app/models/#{relation.class_name.to_s.underscore}.rb")
         end
         if relation.macro == :belongs_to
-          puts "Relation macro #{relation.name} is a has_many updating the foreign key here"
+          puts "Relation macro #{relation.name} is a belongs_to updating the foreign key here"
         elsif relation.macro == :has_many
           puts "Relation macro #{relation.name} is a has_many updating the foreign key here"
           if !relation.options.has_key?(:through)
@@ -97,11 +108,11 @@ module RailsMagicRenamer
             # if relation is UserComment etc (eg a join table)
             if relation.class_name.to_s.match(@from.to_s) && File.exist?("app/models/#{relation.class_name.underscore}.rb")
               # replace user with poster in user_comments.rb
-              replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+              replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
               # replace user_comments -> poster_comments in user.rb
-              replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+              replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
               # move user_comments.rb -> poster_comments.rb
-              `mv "app/models/#{relation.class_name.underscore}.rb" app/models/#{relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore)}.rb`
+              `mv "app/models/#{relation.class_name.underscore}.rb" app/models/#{relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)}.rb`
               # here create migration to rename table
               if Object.const_defined?(relation.class_name) && Object.const_get(relation.class_name).column_names.include?("#{@from.to_s.underscore}_id")
                 generate_rename_column_migration(relation, "#{@from.to_s.underscore}_id")
@@ -121,6 +132,11 @@ module RailsMagicRenamer
               replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.options[:through].to_s, relation.options[:through].to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
               # replace followed_users -> followed_posters in user.rb
               replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+              rename_in_app_lib_rake_spec(relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
+            end
+            # move user_comments_spec.rb to poster_comments_spec.rb
+            if File.exist?("spec/models/#{relation.name.to_s.underscore}_spec.rb")
+              `mv "spec/models/#{relation.name.to_s.underscore}_spec.rb" spec/models/#{relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)}_spec.rb`
             end
           end
         else
@@ -157,7 +173,7 @@ end
     end
 
     def generate_rename_table_migration(from, to)
-      class_name = "Rename#{from}To#{to}"
+      class_name = "Rename#{from.capitalize}To#{to.capitalize}"
       file_contents = "class #{class_name} < ActiveRecord::Migration
   def change
     rename_table :#{from}, :#{to}
@@ -168,55 +184,125 @@ end
       @@timestamp = @@timestamp + 1
     end
 
-    def rename_descendants
-      descendants = @from.descendants.map{|d| d.to_s}.sort
-      # for each descendant loop through
-      # check whether there is a file where we expect it to be (eg app/models/#{relation.name.to_s.singularize}.rb)
-      # if so replace in file
-      # rename file if it matches the rename criteria
-      descendants.each do |descendant|
-        if File.exist?("app/models/#{relation.name.to_s}.rb")
-          replace("app/models/#{relation.name.to_s}.rb")
-        end
+    def rename_controllers
+      to_controller_path = "app/controllers/#{@to.to_s.underscore.pluralize}_controller.rb"
+      `mv app/controllers/#{@from.to_s.underscore.pluralize}_controller.rb #{to_controller_path}`
+      replace(to_controller_path)
+    end
+
+    def rename_views
+      `mv app/views/#{@from.to_s.underscore.pluralize} app/views/#{@to.to_s.underscore.pluralize}` # here test for success?
+    end
+
+    def rename_helpers
+      to_helper_path = "app/helpers/#{@to.to_s.underscore.pluralize}_helper.rb"
+      if File.exist?("app/helpers/#{@from.to_s.underscore.pluralize}_helper.rb")
+        `mv app/helpers/#{@from.to_s.underscore.pluralize}_helper.rb #{to_helper_path}`
+        replace(to_helper_path)
       end
     end
 
+    def rename_routes
+      rake_routes_output = `rake routes | grep #{@from.to_s.underscore}`
+      split_output = rake_routes_output.split(/GET|POST|PATCH|PUT|DELETE|\n/).delete_if{|w| w.match("/")}.map(&:strip!)
+      split_output.each do |path|
+        rename_path(path + "_path")
+        rename_path(path + "_url")
+      end
+      replace('config/routes.rb')
+    end
 
-    # def controller_rename
-    #   setup_for_controller_rename
+    def rename_specs
+      # controller
+      if File.exist?("spec/controllers/#{@from.to_s.underscore.pluralize}_controller_spec.rb")
+        to_spec = "spec/controllers/#{@to.to_s.underscore.pluralize}_controller_spec.rb"
+        `mv spec/controllers/#{@from.to_s.underscore.pluralize}_controller_spec.rb #{to_spec}`
+        replace(to_spec)
+      end
+      # features
+      if File.exist?("spec/features/#{@from.to_s.underscore}_pages_spec.rb")
+        to_spec = "spec/features/#{@to.to_s.underscore}_pages_spec.rb"
+        `mv spec/features/#{@from.to_s.underscore}_pages_spec.rb #{to_spec}`
+        replace(to_spec)
+      end
+      # helpers
+      if File.exist?("spec/helpers/#{@from.to_s.underscore.pluralize}_helper_spec.rb")
+        to_spec = "spec/helpers/#{@to.to_s.underscore.pluralize}_helper_spec.rb"
+        `mv spec/helpers/#{@from.to_s.underscore.pluralize}_helper_spec.rb #{to_spec}`
+        replace(to_spec)
+      end
+      # models
+      if File.exist?("spec/models/#{@from.to_s.underscore}_spec.rb")
+        to_spec = "spec/models/#{@to.to_s.underscore}_spec.rb"
+        `mv spec/models/#{@from.to_s.underscore}_spec.rb #{to_spec}`
+        replace(to_spec)
+      end
+    end
 
-    #   to_controller_path = "app/controllers/#{@to.underscore}.rb"
-    #   to_resource_name   = @to.gsub(/Controller$/, "")
-    #   to_resource_path   = to_resource_name.underscore
+    def rename_path(path_to_rename)
+      return if path_to_rename == "_url" || path_to_rename == "_path"
+      renamed_path = path_to_rename.gsub(@from.to_s.underscore, @to.to_s.underscore).gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize)
+      Dir.glob("app/**/*") do |app_file|
+        next if File.directory?(app_file)
+        replace_in_file(app_file, path_to_rename, renamed_path)
+      end
 
-    #   `mv app/controllers/#{@from.underscore}.rb #{to_controller_path}`
-    #   replace_in_file(to_controller_path, @from, @to)
+      Dir.glob("spec/**/*") do |spec_file|
+        next if File.directory?(spec_file)
+        replace_in_file(spec_file, path_to_rename, renamed_path)
+      end
+    end
 
-    #   # TODO: Use cross-platform move commands.
-    #   if File.exist?("spec/controllers/#{@from.underscore}_spec.rb")
-    #     to_spec = "spec/controllers/#{to_resource_path}_controller_spec.rb"
-    #     `mv spec/controllers/#{@from.underscore}_spec.rb #{to_spec}`
-    #     replace_in_file(to_spec, @from, @to)
-    #   end
+    def rename_assets
+      Dir.glob("app/assets/**/*#{@from.to_s.underscore.pluralize}*") do |asset_file|
+        puts "Asset file: #{asset_file}"
+        puts "Asset file: #{asset_file.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize)}"
+        `mv #{asset_file} #{asset_file.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize)}`
+      end
+      Dir.glob("app/assets/**/*#{@from.to_s.underscore}*") do |asset_file|
+        puts "Asset file: #{asset_file}"
+        puts "Asset file: #{asset_file.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore)}"
+        `mv #{asset_file} #{asset_file.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore)}`
+      end
+    end
 
-    #   if Dir.exist?("app/views/#{@from_resource_path}")
-    #     `mv app/views/#{@from_resource_path} app/views/#{to_resource_path}`
-    #   end
+    # here pass every file in the app folder, lib folder, spec folder through the renamer
+    def rename_everything_else
+      Dir.glob("app/**/*") do |app_file|
+        next if File.directory?(app_file)
+        replace(app_file)
+      end
 
-    #   to_helper_path = "app/helpers/#{to_resource_path}_helper.rb"
-    #   if File.exist?("app/helpers/#{@from_resource_path}_helper.rb")
-    #     `mv app/helpers/#{@from_resource_path}_helper.rb #{to_helper_path}`
-    #     replace_in_file(to_helper_path, @from_resource_name, to_resource_name)
-    #   end
+      Dir.glob("lib/**/*.rb") do |lib_file|
+        replace(lib_file)
+      end
 
-    #   replace_in_file('config/routes.rb', @from_resource_path, to_resource_path)
-    # end
+      Dir.glob("**/*.rake") do |rake_file|
+        replace(rake_file)
+      end
 
-    # def setup_for_controller_rename
-    #   @from_controller, @from_action = @from.split(".")
-    #   @from_resource_name = @from_controller.gsub(/Controller$/, "")
-    #   @from_resource_path = @from_resource_name.underscore
-    # end
+      Dir.glob("spec/**/*.rb") do |spec_file|
+        replace(spec_file)
+      end
+    end
+
+    def rename_in_app_lib_rake_spec(find, replace)
+      Dir.glob("app/**/*.rb") do |app_file|
+        replace_in_file(app_file, find, replace)
+      end
+
+      Dir.glob("lib/**/*.rb") do |lib_file|
+        replace_in_file(lib_file, find, replace)
+      end
+
+      Dir.glob("**/*.rake") do |rake_file|
+        replace_in_file(rake_file, find, replace)
+      end
+
+      Dir.glob("spec/**/*.rb") do |spec_file|
+        replace_in_file(spec_file, find, replace)
+      end
+    end
 
     def replace(file_name)
       replace_in_file(file_name, @from.to_s, @to.to_s)
@@ -226,7 +312,7 @@ end
     def replace_in_file(path, find, replace)
       return false if !File.exist?(path)
       contents = File.read(path)
-      replaced_contents = contents.gsub(/\b#{Regexp.escape(find)}\b/, replace).gsub(/\b#{Regexp.escape("#{find}s")}\b/, "#{replace}s").gsub(/\b#{Regexp.escape("#{find}_id")}\b/, "#{replace}_id")
+      replaced_contents = contents.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '').gsub(/\b#{Regexp.escape(find)}\b/, replace).gsub(/\b#{Regexp.escape("#{find}s")}\b/, "#{replace}s").gsub(/\b#{Regexp.escape("#{find}_id")}\b/, "#{replace}_id")
       File.open(path, "w+") { |f| f.write(replaced_contents) }
     end
 
