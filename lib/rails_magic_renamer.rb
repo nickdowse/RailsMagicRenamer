@@ -129,9 +129,12 @@ module RailsMagicRenamer
               # replace user_comments -> poster_comments in comments.rb
               replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.options[:through].to_s, relation.options[:through].to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
               # replace followed_users -> followed_posters in user.rb
-              replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
-              rename_in_app_lib_rake_spec(relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
+            elsif relation.options[:through].present? && File.exist?("app/models/#{relation.options[:through].to_s.underscore.singularize}.rb")
+              replace_in_file("app/models/#{relation.options[:through].to_s.singularize}.rb", relation.options[:through].to_s, relation.options[:through].to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
             end
+
+            replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+            rename_in_app_lib_rake_spec(relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
             # move user_comments_spec.rb to poster_comments_spec.rb
             if File.exist?("spec/models/#{relation.name.to_s.underscore}_spec.rb")
               `mv "spec/models/#{relation.name.to_s.underscore}_spec.rb" spec/models/#{relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)}_spec.rb`
@@ -159,7 +162,7 @@ end
     end
 
     def generate_rename_column_migration(relation, column_name)
-      class_name = "Rename#{relation.class_name}_#{column_name}"
+      class_name = "Rename#{relation.class_name}#{column_name.camelize}"
       file_contents = "class #{class_name} < ActiveRecord::Migration
   def change
     rename_column :#{relation.plural_name}, :#{column_name}, :#{column_name.gsub(@from.to_s.underscore, @to.to_s.underscore)}
@@ -197,6 +200,7 @@ end
       if File.exist?("app/helpers/#{@from.to_s.underscore.pluralize}_helper.rb")
         `mv app/helpers/#{@from.to_s.underscore.pluralize}_helper.rb #{to_helper_path}`
         replace(to_helper_path)
+        replace_in_file(to_helper_path, "#{@from.pluralize}Helper", "#{@to.pluralize}Helper")
       end
     end
 
