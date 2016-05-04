@@ -105,12 +105,12 @@ module RailsMagicRenamer
             # renaming the through relationship here
             # if relation is UserComment etc (eg a join table)
             if relation.class_name.to_s.match(@from.to_s) && File.exist?("app/models/#{relation.class_name.underscore}.rb")
-              # replace user with poster in user_comments.rb
-              replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
-              # replace user_comments -> poster_comments in user.rb
-              replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
-              # move user_comments.rb -> poster_comments.rb
-              `mv "app/models/#{relation.class_name.underscore}.rb" app/models/#{relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)}.rb`
+              # here rename UserComment class name to PosterComment: UserComment -> PosterComment
+              replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.class_name, relation.class_name.to_s.gsub(@from.to_s.pluralize, @to.to_s.pluralize).gsub(@from.to_s, @to.to_s))
+              # move user_comment.rb -> poster_comment.rb
+              `mv "app/models/#{relation.class_name.underscore}.rb" app/models/#{relation.class_name.underscore.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)}.rb`
+              # Replace user_comments with poster_comments everywhere it might be used:
+              rename_in_app_lib_rake_spec(relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
               # here create migration to rename table
               if Object.const_defined?(relation.class_name) && Object.const_get(relation.class_name).column_names.include?("#{@from.to_s.underscore}_id")
                 generate_rename_column_migration(relation, "#{@from.to_s.underscore}_id")
@@ -128,12 +128,13 @@ module RailsMagicRenamer
             if File.exist?("app/models/#{relation.class_name.underscore}.rb")
               # replace user_comments -> poster_comments in comments.rb
               replace_in_file("app/models/#{relation.class_name.underscore}.rb", relation.options[:through].to_s, relation.options[:through].to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
-              # replace followed_users -> followed_posters in user.rb
             elsif relation.options[:through].present? && File.exist?("app/models/#{relation.options[:through].to_s.underscore.singularize}.rb")
               replace_in_file("app/models/#{relation.options[:through].to_s.singularize}.rb", relation.options[:through].to_s, relation.options[:through].to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
             end
 
+            # replace followed_users -> followed_posters in user.rb
             replace_in_file("app/models/#{@from.to_s.underscore}.rb", relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore))
+            # replace followed_users -> followed_posters in the rest of the app
             rename_in_app_lib_rake_spec(relation.name.to_s, relation.name.to_s.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore))
             # move user_comments_spec.rb to poster_comments_spec.rb
             if File.exist?("spec/models/#{relation.name.to_s.underscore}_spec.rb")
@@ -189,10 +190,24 @@ end
       to_controller_path = "app/controllers/#{@to.to_s.underscore.pluralize}_controller.rb"
       `mv app/controllers/#{@from.to_s.underscore.pluralize}_controller.rb #{to_controller_path}`
       replace(to_controller_path)
+      replace_in_file(to_controller_path, "#{@from.to_s.pluralize}Controller", "#{@to.to_s.pluralize}Controller")
     end
 
     def rename_views
       `mv app/views/#{@from.to_s.underscore.pluralize} app/views/#{@to.to_s.underscore.pluralize}` # here test for success?
+      if !Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.pluralize.underscore}.*").empty?
+        Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.pluralize.underscore}.*") do |partial|
+          subbed_partial = partial.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)
+          `mv #{partial} #{subbed_partial}`
+        end
+      end
+
+      if !Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.underscore}.*").empty?
+        Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.underscore}.*") do |partial|
+          subbed_partial = partial.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)
+          `mv #{partial} #{subbed_partial}`
+        end
+      end
     end
 
     def rename_helpers
@@ -289,7 +304,8 @@ end
     end
 
     def rename_in_app_lib_rake_spec(find, replace)
-      Dir.glob("app/**/*.rb") do |app_file|
+      Dir.glob("app/**/*") do |app_file|
+        next if File.directory?(app_file)
         replace_in_file(app_file, find, replace)
       end
 
