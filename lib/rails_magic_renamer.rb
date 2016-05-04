@@ -76,8 +76,6 @@ module RailsMagicRenamer
       to_model_file = @to.to_s.underscore + ".rb"
 
       rename_relations
-      rename_descendants
-      
 
       # move model file
       `mv app/models/#{@from.to_s.underscore}.rb app/models/#{to_model_file}` # here test for success?
