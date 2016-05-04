@@ -200,7 +200,7 @@ end
       if File.exist?("app/helpers/#{@from.to_s.underscore.pluralize}_helper.rb")
         `mv app/helpers/#{@from.to_s.underscore.pluralize}_helper.rb #{to_helper_path}`
         replace(to_helper_path)
-        replace_in_file(to_helper_path, "#{@from.pluralize}Helper", "#{@to.pluralize}Helper")
+        replace_in_file(to_helper_path, "#{@from.to_s.pluralize}Helper", "#{@to.to_s.pluralize}Helper")
       end
     end
 
