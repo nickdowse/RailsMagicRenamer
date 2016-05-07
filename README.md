@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/travis/nickdowse/rails_magic_renamer.svg)](https://travis-ci.org/nickdowse/rails_magic_renamer) [![Code Climate](https://codeclimate.com/github/nickdowse/rails_magic_renamer/badges/gpa.svg)](https://codeclimate.com/github/nickdowse/rails_magic_renamer) 
+[![Build Status](https://img.shields.io/travis/nickdowse/rails_magic_renamer.svg)](https://travis-ci.org/nickdowse/rails_magic_renamer) 
 [![Test Coverage](https://codeclimate.com/github/nickdowse/rails_magic_renamer/badges/coverage.svg)](https://codeclimate.com/github/nickdowse/rails_magic_renamer/coverage)
   
 
