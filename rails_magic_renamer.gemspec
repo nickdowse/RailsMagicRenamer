@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = RailsMagicRenamer::VERSION
   spec.authors       = ["Nick Dowse"]
   spec.email         = ["nm.dowse@gmail.com"]
-  spec.description   = %q{Rename rails models, magically}
+  spec.description   = %q{Rename rails models, magically. Pre-release, not production ready}
   spec.summary       = %q{Rename rails models, magically}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/nickdowse/RailsMagicRenamer"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
