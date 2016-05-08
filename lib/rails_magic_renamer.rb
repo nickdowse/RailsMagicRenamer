@@ -2,6 +2,7 @@ require 'rails_magic_renamer/version'
 require 'rails_magic_renamer/exceptions'
 require 'active_support/inflector'
 require 'active_support/core_ext/string/inflections'
+require 'filemagic'
 
 module RailsMagicRenamer
 
@@ -344,7 +345,7 @@ end
     def text?(filename)
       begin
         fm = FileMagic.new(FileMagic::MAGIC_MIME)
-        fm.file(filename) =~ /^text\//
+        fm.file(filename).match(/text/).present?
       ensure
         fm.close
       end
