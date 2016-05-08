@@ -16,6 +16,8 @@ you can easily review changes.
 To install:
     `gem install rails_magic_renamer`
 
+If you encounter an error installing the gem, as ruby-filemagic does not install, then follow the instructions in this Stack Overflow question to install it: http://stackoverflow.com/questions/15577171/missing-library-while-installing-ruby-filemagic-gem-on-linux
+
 Before use, make sure you cd to the root of your rails project.
 
 To rename an object open up `rails console` and run:

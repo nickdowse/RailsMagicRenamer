@@ -286,7 +286,7 @@ end
     # here pass every file in the app folder, lib folder, spec folder through the renamer
     def rename_everything_else
       Dir.glob("app/**/*") do |app_file|
-        next if File.directory?(app_file)
+        next if File.directory?(app_file) || !text?(app_file)
         replace(app_file)
       end
 
@@ -305,7 +305,7 @@ end
 
     def rename_in_app_lib_rake_spec(find, replace)
       Dir.glob("app/**/*") do |app_file|
-        next if File.directory?(app_file)
+        next if File.directory?(app_file) || !text?(app_file)
         replace_in_file(app_file, find, replace)
       end
 
@@ -339,6 +339,19 @@ end
       return @in_test_mode if @in_test_mode.present?
       @in_test_mode = File.exist?('./rails_magic_renamer.gemspec') || File.exist?('../../../rails_magic_renamer.gemspec')
       return @in_test_mode
+    end
+
+    def text?(filename)
+      begin
+        fm = FileMagic.new(FileMagic::MAGIC_MIME)
+        fm.file(filename) =~ /^text\//
+      ensure
+        fm.close
+      end
+    end
+
+    def binary?(filename)
+      !text?
     end
   end
 end
