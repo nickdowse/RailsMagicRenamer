@@ -330,7 +330,8 @@ end
     def replace_in_file(path, find, replace)
       return false if !File.exist?(path)
       contents = File.read(path)
-      replaced_contents = contents.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '').gsub(/\b#{Regexp.escape(find)}\b/, replace).gsub(/\b#{Regexp.escape("#{find}s")}\b/, "#{replace}s").gsub(/\b#{Regexp.escape("#{find}_id")}\b/, "#{replace}_id")
+      contents = contents.unpack('C*').pack('U*') if !contents.valid_encoding?
+      replaced_contents = contents.gsub(/\b#{Regexp.escape(find)}\b/, replace).gsub(/\b#{Regexp.escape("#{find}s")}\b/, "#{replace}s").gsub(/\b#{Regexp.escape("#{find}_id")}\b/, "#{replace}_id")
       File.open(path, "w+") { |f| f.write(replaced_contents) }
     end
 

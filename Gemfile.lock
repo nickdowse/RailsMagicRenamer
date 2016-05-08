@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_magic_renamer (2.0)
+    rails_magic_renamer (2.0.0.pre.alpha)
 
 GEM
   remote: http://rubygems.org/

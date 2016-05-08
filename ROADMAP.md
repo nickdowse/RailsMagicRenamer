@@ -41,13 +41,20 @@ I would like this gem to rename much more comprehensively than it currently is, 
 - Here make certain to skip database folder - done
 - This will Change all references from model -> model (@pressdoc.campaigns -> @pressdoc.distributions) -> Similar to above where it takes the file and replaces all instances of 'campaigns' with 'campaign'. It will also update instance variables (@campaign -> @distribution) - done
 
-# Spec checks
+### Spec checks
 * Update specs (campaign_spec.rb -> distribution_spec.rb) - done
 * Update factories (campaign_factory -> distribution_factory) - done
 * Run specs # TODO
 
 ### Other
 * Update README to new name # TODO
+* DO NOT replace UTF-8 characters with nil, as it will delete all UTF-8 characters in app
+
+## Meta
+* Add in comprehensive logging so you can see what is happening at each point of code
+* Write more tests
+* Rewrite gem readme so that it is understandable
+* Fill in accurate description and summary in rubygems
 
 Other notes:
 
