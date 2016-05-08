@@ -152,7 +152,7 @@ module RailsMagicRenamer
     end
 
     def generate_rename_table_migration_from_relation(relation)
-      class_name = "Rename#{relation.class_name}"
+      class_name = "Rename#{relation.class_name.camelize}"
       file_contents = "class #{class_name} < ActiveRecord::Migration
   def change
     rename_table :#{relation.plural_name}, :#{relation.plural_name.to_s.gsub(@from.to_s.underscore, @to.to_s.underscore)}
@@ -164,7 +164,7 @@ end
     end
 
     def generate_rename_column_migration(relation, column_name)
-      class_name = "Rename#{relation.class_name}#{column_name.camelize}"
+      class_name = "Rename#{relation.class_name.camelize}#{column_name.camelize}"
       file_contents = "class #{class_name} < ActiveRecord::Migration
   def change
     rename_column :#{relation.plural_name}, :#{column_name}, :#{column_name.gsub(@from.to_s.underscore, @to.to_s.underscore)}
@@ -176,7 +176,7 @@ end
     end
 
     def generate_rename_table_migration(from, to)
-      class_name = "Rename#{from.capitalize}To#{to.capitalize}"
+      class_name = "Rename#{from.camelize}To#{to.camelize}"
       file_contents = "class #{class_name} < ActiveRecord::Migration
   def change
     rename_table :#{from}, :#{to}
