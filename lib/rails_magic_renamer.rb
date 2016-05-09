@@ -196,15 +196,15 @@ end
 
     def rename_views
       `mv app/views/#{@from.to_s.underscore.pluralize} app/views/#{@to.to_s.underscore.pluralize}` # here test for success?
-      if !Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.pluralize.underscore}.*").empty?
-        Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.pluralize.underscore}.*") do |partial|
+      if !Dir.glob("app/views/**/_#{@from.to_s.pluralize.underscore}.*").empty?
+        Dir.glob("app/views/**/_#{@from.to_s.pluralize.underscore}.*") do |partial|
           subbed_partial = partial.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)
           `mv #{partial} #{subbed_partial}`
         end
       end
 
-      if !Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.underscore}.*").empty?
-        Dir.glob("app/views/#{@to.to_s.underscore.pluralize}/_#{@from.to_s.underscore}.*") do |partial|
+      if !Dir.glob("app/views/**/_#{@from.to_s.underscore}.*").empty?
+        Dir.glob("app/views/**/_#{@from.to_s.underscore}.*") do |partial|
           subbed_partial = partial.gsub(@from.to_s.underscore.pluralize, @to.to_s.underscore.pluralize).gsub(@from.to_s.underscore, @to.to_s.underscore)
           `mv #{partial} #{subbed_partial}`
         end
