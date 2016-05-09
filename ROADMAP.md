@@ -44,6 +44,7 @@ I would like this gem to rename much more comprehensively than it currently is, 
 ### Spec checks
 * Update specs (campaign_spec.rb -> distribution_spec.rb) - done
 * Update factories (campaign_factory -> distribution_factory) - done
+* Update factory name if in standalone file (pr_contact_factory.rb -> spokesperson_factory.rb)
 * Run specs # TODO
 
 ### Other

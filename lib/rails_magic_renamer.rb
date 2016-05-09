@@ -255,6 +255,12 @@ end
         `mv spec/models/#{@from.to_s.underscore}_spec.rb #{to_spec}`
         replace(to_spec)
       end
+      # factories
+      if File.exist?("spec/factories/#{@from.to_s.underscore}_factory.rb")
+        to_spec = "spec/factories/#{@to.to_s.underscore}_factory.rb"
+        `mv spec/factories/#{@from.to_s.underscore}_factory.rb #{to_spec}`
+        replace(to_spec)
+      end
     end
 
     def rename_path(path_to_rename)
