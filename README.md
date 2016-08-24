@@ -53,7 +53,7 @@ Then, you'll need to install bundler and the gem dependencies:
 
   `gem install bundler && bundle install`
 
-  You should now be able to run the local tests:
+  You should now be able to run the tests locally:
 
     bundle exec rake
 
